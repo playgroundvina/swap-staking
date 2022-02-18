@@ -95,7 +95,7 @@ function App() {
   }
 
   if (web3 && accounts && contracts) {
-    if (accounts[0] === "0x0d1B4d703a72e35080b9CcA7D2eF7f0145c071b9") {
+    if (accounts[0] === "0x7eA2EAFf3dC617abb2Fa9F1C8f93b0aE821f1390") {
       return (
         <Admin Web3={web3} Contracts={contracts} Accounts={accounts}></Admin>
       );
