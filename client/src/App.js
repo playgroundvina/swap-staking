@@ -1,12 +1,15 @@
-import React, { Component, useState, useEffect } from "react";
-import TokenSwap from "./contracts/TokenSwap.json";
-import TokenABC from "./contracts/TokenABC.json";
-import TokenXYZ from "./contracts/TokenXYZ.json";
-import getWeb3 from "./getWeb3";
-import Admin from "./components/Admin";
-import TokenSwapScreen from "./components/TokenSwapScreen";
-import "./App.css";
-import Particles from "react-tsparticles";
+import React, { Component, useState, useEffect } from 'react';
+import TokenSwap from './contracts/TokenSwap.json';
+import TokenABC from './contracts/TokenABC.json';
+import TokenXYZ from './contracts/TokenXYZ.json';
+import getWeb3 from './getWeb3';
+import Admin from './components/Admin';
+import TokenSwapScreen from './components/TokenSwapScreen';
+import TokenSwapMain from './components/TokenSwap';
+import './App.css';
+import Particles from 'react-tsparticles';
+import GlobalStyled from './GlobalStyled';
+import AppContext from './AppContext';
 
 function App() {
   const [web3, setweb3] = useState(null);
@@ -22,11 +25,11 @@ function App() {
       try {
         // Get network provider and web3 instance.
         const web3 = await getWeb3();
-
         //shoudl check wether metamsk is connected to the desired network or not, if not ask the user to sitch networks
 
         // Use web3 to get the user's accounts.
         const metaMaskAccounts = await web3.eth.getAccounts();
+
         // Get the contract instance.
         const networkId = await web3.eth.net.getId();
 
@@ -66,134 +69,70 @@ function App() {
         console.error(error);
       }
     };
-    init();
   }, []);
 
+  // useEffect(() => {
+  //   const load = async () => {
+  //     window.ethereum.on("accountsChanged", async (accounts) => {
+  //       console.log("accountsChanges", accounts);
+  //       setaccounts(accounts);
+  //       window.location.reload();
+  //     });
+  //   };
+  //   if (web3 && accounts) {
+  //     load();
+  //   }
+  // }, [web3, contracts, accounts]);
+
+  // if (!web3) {
+  //   return(
+  //     <React.Fragment>
+  //       <div class="d-flex justify-content-center position-absolute top-50 start-50 translate-middle">
+  //         <div class="spinner-grow" style={{width: "6rem", height: "6rem"}} role="status">
+  //         </div>
+  //       </div>
+  //     </React.Fragment>
+  //   )
+
+  // }
+
+  // if (web3 && accounts && contracts) {
+  //   if (accounts[0] === "0x1088725f456fFb14635db800cDc756e0425E638Fa") {
+  //     return (
+  //       <Admin Web3={web3} Contracts={contracts} Accounts={accounts}></Admin>
+  //     );
+  //   } else {
+  //     console.log("contracts from app");
+
+  //   }
+  // }
+
   useEffect(() => {
-    const load = async () => {
-      window.ethereum.on("accountsChanged", async (accounts) => {
-        console.log("accountsChanges", accounts);
-        setaccounts(accounts);
-        window.location.reload();
-      });
-    };
-    if (web3 && accounts) {
-      load();
-    }
-  }, [web3, contracts, accounts]);
-
-  if (!web3) {
-    return( 
-      <React.Fragment>
-        <div class="d-flex justify-content-center position-absolute top-50 start-50 translate-middle">
-          <div class="spinner-grow" style={{width: "6rem", height: "6rem"}} role="status">
-          </div>
-        </div>
-      </React.Fragment>
-    )
+    const init = async () => {
+      try {
+        const web3 = await getWeb3();
         
-  }
-
-  if (web3 && accounts && contracts) {
-    if (accounts[0] === "0x7eA2EAFf3dC617abb2Fa9F1C8f93b0aE821f1390") {
-      return (
-        <Admin Web3={web3} Contracts={contracts} Accounts={accounts}></Admin>
-      );
-    } else {
-      console.log("contracts from app");
-      console.log(contracts);
-      return (
-        <React.Fragment>
-          <Particles
-            id="tsparticles"
-            options={{
-              background: {
-                color: {
-                  value: "#0e7569",
-                },
-              },
-              fpsLimit: 60,
-              interactivity: {
-                events: {
-                  onClick: {
-                    enable: true,
-                    mode: "push",
-                  },
-                  onHover: {
-                    enable: true,
-                    mode: "grab",
-                  },
-                  resize: true,
-                },
-                modes: {
-                  bubble: {
-                    distance: 400,
-                    duration: 2,
-                    opacity: 0.8,
-                    size: 40,
-                  },
-                  push: {
-                    quantity: 2,
-                  },
-                  repulse: {
-                    distance: 200,
-                    duration: 0.4,
-                  },
-                },
-              },
-              particles: {
-                color: {
-                  value: "#ffffff",
-                },
-                links: {
-                  color: "#ffffff",
-                  distance: 150,
-                  enable: true,
-                  opacity: 0.5,
-                  width: 1,
-                },
-                collisions: {
-                  enable: true,
-                },
-                move: {
-                  direction: "none",
-                  enable: true,
-                  outMode: "bounce",
-                  random: false,
-                  speed: 2,
-                  straight: false,
-                },
-                number: {
-                  density: {
-                    enable: true,
-                    value_area: 800,
-                  },
-                  value: 50,
-                },
-                opacity: {
-                  value: 0.5,
-                },
-                shape: {
-                  type: "circle",
-                },
-                size: {
-                  random: true,
-                  value: 5,
-                },
-              },
-              detectRetina: true,
-            }}
-          />
-          <TokenSwapScreen
-            Web3={web3}
-            Contracts={contracts}
-            Accounts={accounts}
-          ></TokenSwapScreen>
-        </React.Fragment>
-      );
+      } catch (error) {
+        
+      }
     }
-  }
+    init();
+  }, [])
 
+  return (
+    <AppContext>
+      <GlobalStyled />
+      <TokenSwapMain />
+    </AppContext>
+    // <React.Fragment>
+
+    //   {/* <TokenSwapScreen
+    //     Web3={web3}
+    //     Contracts={contracts}
+    //     Accounts={accounts}
+    //   ></TokenSwapScreen> */}
+    // </React.Fragment>
+  );
   return <div className="App"></div>;
 }
 

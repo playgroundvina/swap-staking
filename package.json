@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.2",
-    "@truffle/hdwallet-provider": "^1.5.1"
+    "@truffle/hdwallet-provider": "^1.5.1",
+    "lodash": "^4.17.21",
+    "styled-components": "^5.3.3"
   }
 }
