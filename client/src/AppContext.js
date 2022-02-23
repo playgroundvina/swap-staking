@@ -51,8 +51,13 @@ const AppContextProvider = ({ children }) => {
         setAccount(web3.utils.toChecksumAddress(selectedAccount));
         window.ethereum.on('accountsChanged', (accounts) => {
           setHasAccountChanged(true);
+
           if (!accounts[0]) {
             setHasWalletAddress(false);
+            setAccount(null);
+            setTokenSwap(null);
+            setTokenReceive(null);
+            setReceiveList(null);
           } else {
             setHasWalletAddress(true);
             setAccount(accounts[0]);

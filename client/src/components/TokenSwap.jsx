@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import Coin from './Coin';
 import ArrowDown from './ArrowDown';
 import ChevronDown from './ChevronDown';
 import ModalSwap from './Modal';
@@ -9,41 +8,28 @@ import useMetamask from '../hooks/useMetamask';
 import { AppContext } from '../AppContext';
 import ERC20 from '../contracts/ERC20.json';
 import ConvertToken from '../contracts/ConvertToken.json';
+import ScreenBlocking from './ScreenBlocking';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const Navbar = styled.div`
-  height: 80px;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  padding: 1rem;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-`;
-
-const MainWrapper = styled.div`
-  min-height: 100vh;
-  background: rgb(247, 248, 250);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+const SWAPCONTRACT_ADDRESS = '0x8f2d176E8d232DE9a1CF70a0bC4c38b30E2E442B';
 
 const SwapBoard = styled.div`
   background: #fff;
   border-radius: 20px;
   box-shadow: 0 10px 10px 3px rgba(0, 0, 0, 0.1);
   padding: 2rem 1rem 1rem;
-  width: clamp(50%, 500px, 95%);
   height: 400px;
-  border: 1px solid #e6e6e6;
+  border: 1px solid rgba(136, 204, 253, 0.5);
 `;
 
 const BoardWrapper = styled.div`
-  text-align: center;
+ margin:auto;
 `;
 
 const Text = styled.p`
   margin-left: 8px;
-  color: rgba(120, 0, 44);
+  color: ${({ color }) => color ?? 'rgb(136,204,253)'};
   font-weight: 700;
   font-size: ${({ fontSize }) => fontSize ?? '32px'};
   ${({ truncate }) =>
@@ -72,7 +58,12 @@ const SubtitleText = styled.p`
   font-size: 14px;
 `;
 
-const StyledButton = styled.div`
+const StyledImg = styled.img`
+  width: ${({ width }) => width ?? '100%'};
+  height: auto;
+`;
+
+export const StyledButton = styled.div`
   background: rgb(136, 204, 253);
   border-radius: 20px;
   color: #fff;
@@ -81,7 +72,10 @@ const StyledButton = styled.div`
   padding: 1rem;
   transition: filter 0.2s ease-out;
   cursor: pointer;
-
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: ${({ fontSize }) => fontSize ?? '16px'};
   &.success {
     background: rgb(17, 153, 250);
     border-radius: 10px;
@@ -140,7 +134,7 @@ const SelectTokenBox = styled(StyledButton)`
   justify-content: center;
 `;
 
-const RenderConnectButton = (account) => {
+export const RenderConnectButton = (account) => {
   const { handleConnect } = useMetamask();
   if (!account)
     return (
@@ -149,13 +143,13 @@ const RenderConnectButton = (account) => {
       </StyledButton>
     );
   return (
-    <Text fontSize="16px">
+    <Text fontSize="16px" color="#333">
       {account.slice(0, 5)}...{account.slice(-5)}
     </Text>
   );
 };
 
-const RenderApproveButton = (account, handleApprove) => {
+const RenderApproveButton = (account, handleApprove, tokenSwap) => {
   const { handleConnect } = useMetamask();
   if (!account)
     return (
@@ -164,14 +158,23 @@ const RenderApproveButton = (account, handleApprove) => {
       </StyledButton>
     );
   return (
-    <StyledButton className="success" onClick={() => handleApprove()}>
+    <StyledButton
+      className="success"
+      disabled={!tokenSwap}
+      onClick={tokenSwap ? handleApprove : null}
+    >
       Approve
     </StyledButton>
   );
 };
 
 const RenderSwapButton = (account, isSwapable, handleSwap, amount) => {
-  return (
+  const { handleConnect } = useMetamask();
+  return !account ? (
+    <StyledButton className="success" onClick={handleConnect}>
+      Connect Wallet
+    </StyledButton>
+  ) : (
     <StyledButton
       className="success"
       disabled={!isSwapable}
@@ -182,10 +185,8 @@ const RenderSwapButton = (account, isSwapable, handleSwap, amount) => {
   );
 };
 
-const TokenSwap = () => {
-
+const TokenSwap = ({ account }) => {
   const {
-    account,
     web3,
     tokenReceive,
     tokenSwap,
@@ -198,25 +199,57 @@ const TokenSwap = () => {
   const [amount, setAmount] = useState('');
   const [isSwapable, setSwapable] = useState(false);
   const [isApprove, setApprove] = useState(false);
-  const [balance, setBalance] = useState(0);
+  const [balanceSwap, setBalanceSwap] = useState(0);
+  const [balanceReceive, setBalanceReceive] = useState(0);
   const [isLoading, setLoading] = useState(false);
   const [swapModal, setSwapModal] = useState(false);
   const [receiveModal, setReceiveModal] = useState(false);
+  const [ratio, setRatio] = useState(0);
 
   useEffect(() => {
-    if (tokenSwap) checkApproveToTransfer();
+    if (tokenSwap) {
+      checkApproveToTransfer();
+    }
   }, [tokenSwap, tokenReceive]);
+
+  useEffect(() => {
+    checkSwapAmount();
+  }, [amount]);
+
+  const checkSwapAmount = () => {
+    if (amount > 0 && amount <= balanceSwap) {
+      setSwapable(true);
+      return;
+    }
+    setSwapable(false);
+  };
 
   const checkApproveToTransfer = async () => {
     try {
       const contract = new web3.eth.Contract(ERC20.abi, tokenSwap.address);
-      const [balanceRes, approveRes] = await Promise.allSettled([
-        contract.methods.balanceOf(account).call(),
-        contract.methods
-          .allowance(account, '0x7684C9287f32041F1f53E757EC2988E9461c9380')
-          .call(),
-      ]);
-      setBalance(balanceRes.value / 10 ** 18);
+      const receiveContract = new web3.eth.Contract(
+        ERC20.abi,
+        tokenReceive.address,
+      );
+      const convertContract = new web3.eth.Contract(
+        ConvertToken,
+        SWAPCONTRACT_ADDRESS,
+      );
+      setLoading(true);
+      const [balanceSwapRes, balanceReceiveRes, approveRes, ratioRes] =
+        await Promise.allSettled([
+          contract.methods.balanceOf(account).call(),
+          receiveContract.methods.balanceOf(account).call(),
+          contract.methods.allowance(account, SWAPCONTRACT_ADDRESS).call(),
+          convertContract.methods
+            .listOfTokenConvertRatio(tokenSwap.address, tokenReceive.address)
+            .call(),
+        ]);
+      setRatio(ratioRes.value / 1000);
+      setBalanceSwap(balanceSwapRes.value / 10 ** 18);
+      setBalanceReceive(balanceReceiveRes.value / 10 ** 18);
+      setLoading(false);
+
       if (approveRes.value > 10 ** 18) {
         setApprove(true);
         return;
@@ -230,34 +263,36 @@ const TokenSwap = () => {
   const handleApprove = () => {
     const approveContract = new web3.eth.Contract(ERC20.abi, tokenSwap.address);
     const amountToWei = web3.utils.toWei('1000000000');
+
+    setLoading(true);
     approveContract.methods
-      .approve('0x7684C9287f32041F1f53E757EC2988E9461c9380', amountToWei)
+      .approve(SWAPCONTRACT_ADDRESS, amountToWei)
       .send({ from: account })
       .then(() => {
         setApprove(true);
+        setLoading(false);
       })
       .catch((error) => {
+        setLoading(false);
         console.log(error);
       });
   };
 
   const onAmountChangeHandler = (e) => {
-    const amountValue = e.target.value;
-    if (amountValue > 0 && amountValue <= balance) setSwapable(true);
-    else setSwapable(false);
-    setAmount(amountValue);
+    setAmount(e.target.value);
   };
 
   const setMaxBalance = () => {
-    setAmount(balance);
+    setAmount(balanceSwap);
   };
-  
+
   const handleSwap = async (amount) => {
     if (amount > 0) {
       try {
+        setLoading(true);
         const convertContract = new web3.eth.Contract(
           ConvertToken,
-          '0x7684C9287f32041F1f53E757EC2988E9461c9380',
+          SWAPCONTRACT_ADDRESS,
         );
         const amountToWei = web3.utils.toWei(amount);
         const response = await convertContract.methods
@@ -267,9 +302,17 @@ const TokenSwap = () => {
             amountToWei,
           )
           .send({ from: account });
-        console.log('response:', response);
+        await checkApproveToTransfer();
+        toast('Transaction successfull!', {
+          position: 'top-center',
+          hideProgressBar: true,
+          autoClose: 3000,
+          type: 'success',
+        });
+        setAmount('');
       } catch (error) {
         console.log(error);
+        setLoading(false);
       }
     } else alert('');
   };
@@ -280,91 +323,93 @@ const TokenSwap = () => {
   const handleReceiveModalClose = () => setReceiveModal(false);
 
   return (
-    <main>
-      <Navbar>
-        <Flex
-          justifyContent="space-between"
-          alignItems="center"
-          className="container"
-        >
-          <Flex alignItems="center">
-            {/* <Coin width="60px" />
-            <Text> | Token Swap</Text> */}
+    <>
+      <BoardWrapper>
+        <SwapBoard>
+          <InputTokenWrapper>
+            <Flex justifyContent="space-between" className="pb-3">
+              <StyledInputLabel>From</StyledInputLabel>
+              <StyledInputLabel
+                onClick={setMaxBalance}
+                style={{ cursor: 'pointer' }}
+              >
+                Balance: {balanceSwap.toFixed(2)}
+              </StyledInputLabel>
+            </Flex>
+            <Flex>
+              <StyledInput
+                type="number"
+                className="col-7"
+                placeholder="0.00"
+                onChange={onAmountChangeHandler}
+                value={amount}
+                step="1"
+              />
+              <SelectTokenBox
+                className="col-5 success"
+                onClick={account ? onSwapModalOpen : null}
+                disabled={!account}
+              >
+                {!tokenSwap ? (
+                  <>Token Swap</>
+                ) : (
+                  <>
+                    <StyledImg
+                      src={`/tokens/${tokenSwap.name}.svg`}
+                      width="24px"
+                      className="me-1"
+                    />
+                    <span>{tokenSwap.name}</span>
+                  </>
+                )}
+
+                <ChevronDown width="12px" className="ms-1" />
+              </SelectTokenBox>
+            </Flex>
+          </InputTokenWrapper>
+          <Flex justifyContent="center " className="mb-4">
+            <ArrowDown width="16px" className="me-1" />
+            Ratio : {ratio}
           </Flex>
-          <Flex>{RenderConnectButton(account)}</Flex>
-        </Flex>
-      </Navbar>
-      <MainWrapper>
-        <BoardWrapper>
-          <TitleText>Tokens Swap</TitleText>
-          <SubtitleText>
-            The Best Place to Swap Old Tokens To New Tokens
-          </SubtitleText>
-          <SwapBoard>
-            <InputTokenWrapper>
-              <Flex justifyContent="space-between" className="pb-3">
-                <StyledInputLabel>From</StyledInputLabel>
-                <StyledInputLabel
-                  onClick={setMaxBalance}
-                  style={{ cursor: 'pointer' }}
-                >
-                  Balance: {balance}
-                </StyledInputLabel>
-              </Flex>
-              <Flex>
-                <StyledInput
-                  type="number"
-                  className="col-7"
-                  placeholder="0.00"
-                  onChange={onAmountChangeHandler}
-                  value={amount}
-                  step="1"
-                />
+          <InputTokenWrapper>
+            <Flex justifyContent="space-between" className="pb-3">
+              <StyledInputLabel>To (estimated)</StyledInputLabel>
+              <StyledInputLabel>
+                Balance: {balanceReceive.toFixed(2)}
+              </StyledInputLabel>
+            </Flex>
+            <Flex>
+              <StyledInput
+                type="text"
+                placeholder="0.00"
+                className="col-7"
+                readOnly
+                value={amount * ratio}
+              />
+              {tokenReceive && (
                 <SelectTokenBox
                   className="col-5 success"
-                  onClick={onSwapModalOpen}
+                  onClick={onReceiveModalOpen}
                 >
-                  {!tokenSwap ? (
-                    <>
-                      Token Swap
-                      <ChevronDown width="12px" className="ms-1" />
-                    </>
-                  ) : (
-                    <span>{tokenSwap.name}</span>
-                  )}
+                  <StyledImg
+                    src={`/tokens/${tokenReceive.name}.svg`}
+                    width="24px"
+                    className="me-1"
+                  />
+                  {tokenReceive.name}{' '}
+                  <ChevronDown width="12px" className="ms-2" />
                 </SelectTokenBox>
-              </Flex>
-            </InputTokenWrapper>
-            <ArrowDown width="16px" className="mb-3" />
-            <InputTokenWrapper>
-              <Flex justifyContent="space-between" className="pb-3">
-                <StyledInputLabel>To (estimated)</StyledInputLabel>
-                <StyledInputLabel>Balance: 0</StyledInputLabel>
-              </Flex>
-              <Flex>
-                <StyledInput
-                  type="text"
-                  placeholder="0.00"
-                  className="col-7"
-                  readOnly
-                />
-                {tokenReceive && (
-                  <SelectTokenBox
-                    className="col-5 success"
-                    onClick={onReceiveModalOpen}
-                  >
-                    {tokenReceive.name}{' '}
-                    {/* <ChevronDown width="12px" className="ms-1" /> */}
-                  </SelectTokenBox>
-                )}
-              </Flex>
-            </InputTokenWrapper>{' '}
+              )}
+            </Flex>
+          </InputTokenWrapper>{' '}
+          <div className="mt-5">
             {!isApprove
-              ? RenderApproveButton(account, handleApprove)
+              ? RenderApproveButton(account, handleApprove, tokenSwap)
               : RenderSwapButton(account, isSwapable, handleSwap, amount)}
-          </SwapBoard>
-        </BoardWrapper>
-      </MainWrapper>
+          </div>
+        </SwapBoard>
+      </BoardWrapper>
+
       <ModalSwap
         title="Select a token to swap"
         isActive={swapModal}
@@ -381,7 +426,9 @@ const TokenSwap = () => {
           onTokenChoose={onTokenReceiveChoose}
         />
       )}
-    </main>
+      <ScreenBlocking isLoading={isLoading} />
+      <ToastContainer />
+    </>
   );
 };
 
