@@ -8,20 +8,28 @@ const OverLay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
 `;
 
-const SpinnerLoader = styled.div`
+const SpinnerWrapper = styled.div`
   margin: auto;
+  text-align:center;
+`;
+
+const SpinnerLoader = styled.div`
   width: 2rem;
   height: 2rem;
+
 `;
 const ScreenBlocking = ({ isLoading }) => {
   return (
     isLoading && (
       <OverLay>
-        <SpinnerLoader className="spinner-border" />
+        <SpinnerWrapper>
+          <SpinnerLoader className="spinner-border text-primary" />
+          <p className='text-center mt-2'>Loading transaction....</p>
+        </SpinnerWrapper>
       </OverLay>
     )
   );

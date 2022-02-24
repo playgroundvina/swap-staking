@@ -22,6 +22,8 @@ const Navbar = styled.div`
   width: 100%;
   padding: 1rem;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  background: rgb(247, 248, 250);
+  z-index: 100;
 `;
 
 const StyledLink = styled(Link)`
@@ -36,7 +38,6 @@ const NetWorkButton = styled(StyledButton)`
   background: orange;
   text-transform: uppercase;
   font-size: 12px;
- 
 `;
 function App() {
   const { account, networkId } = useContext(AppContext);
@@ -147,14 +148,9 @@ function App() {
           alignItems="center"
           className="container h-100"
         >
+          <Flex alignItems="center"></Flex>
           <Flex alignItems="center">
-            {/* <StyledLink to="/">Swap</StyledLink> */}
-            {/* <StyledLink to="/staking" className="ms-3">
-              Staking
-            </StyledLink> */}
-          </Flex>
-          <Flex alignItems="center">
-            {networkId !== 4 ? (
+            {networkId !== 4 && account ? (
               <>
                 <NetWorkButton onClick={() => switchNetworkHandler(4)}>
                   Wrong network
@@ -167,7 +163,10 @@ function App() {
         </Flex>
       </Navbar>
       <Routes>
-        <Route path="/" element={<StakingSwap account={account} />} />
+        <Route
+          path="/"
+          element={<StakingSwap networkId={networkId} account={account} />}
+        />
         {/* <Route exace path="/staking" element={<Staking account={account} />} /> */}
       </Routes>
     </Layout>

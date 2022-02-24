@@ -24,6 +24,8 @@ const AppContextProvider = ({ children }) => {
   const [accountBalance, setBalance] = useState(0);
   const [hasWalletAddress, setHasWalletAddress] = useState(false);
   const [hasAccountChanged, setHasAccountChanged] = useState(false);
+  const [history, setHistory] = useState(null);
+
 
   const onTokenSwapChoose = (address) => {
     const newTokenSwap = swapList.find(

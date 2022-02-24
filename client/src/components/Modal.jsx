@@ -4,16 +4,15 @@ import CloseIcon from './CloseIcon';
 import TokenList from './TokenList';
 
 const Overlay = styled.div`
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.5);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-
   transition: 0.2s ease-in;
   ${({ isActive }) =>
-    isActive ? 'opacity:1;z-index: 100;' : 'opacity:0;z-index:-1;'}
+    isActive ? 'opacity:1;z-index: 1000;' : 'opacity:0;z-index:-1;'}
 `;
 
 const ModalWrapper = styled.div`
