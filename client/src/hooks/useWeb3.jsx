@@ -51,7 +51,7 @@ const useWeb3 = (web3, account) => {
     token0Address,
     token1Address,
     amount,
-    pkgId = 1,
+    pkgId
   ) => {
     const swapContract = getSwapStakingContract(web3);
 
@@ -60,7 +60,7 @@ const useWeb3 = (web3, account) => {
         token0Address,
         token1Address,
         convertToWeii(amount),
-        1,
+        pkgId,
       )
       .send({ from: account });
     await getHistoryStake();
@@ -134,6 +134,25 @@ const useWeb3 = (web3, account) => {
     } catch (error) {}
   };
 
+  const harvestProfit = async (profileId) => {
+    try {
+      const contract = getSwapStakingContract(web3);
+      const data = await contract.methods.claimStaking(profileId).call();
+      console.log('data:', data)
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const unlockStake = async () => {
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
+
   const convertToWeii = (amount) => web3.utils.toWei(amount);
   const convertToTokens = (amount) => {
     return web3.utils.fromWei(amount, 'ether');
@@ -145,6 +164,7 @@ const useWeb3 = (web3, account) => {
     getSwapRatio,
     onApproveHandler,
     getHistoryStake,
+    harvestProfit
   };
 };
 

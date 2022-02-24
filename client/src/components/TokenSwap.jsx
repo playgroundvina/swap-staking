@@ -1,19 +1,11 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import ArrowDown from './ArrowDown';
 import ChevronDown from './ChevronDown';
 import ModalSwap from './Modal';
 import ModalReceive from './Modal';
 import useMetamask from '../hooks/useMetamask';
-import { AppContext } from '../AppContext';
-import ERC20 from '../contracts/ERC20.json';
-import ConvertToken from '../contracts/ConvertToken.json';
 import ScreenBlocking from './ScreenBlocking';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import useWeb3 from '../hooks/useWeb3';
-
-const SWAPCONTRACT_ADDRESS = '0x5E70B1E932B0F174E564ad45d6914BFfba6dF1EE';
 
 const SwapBoard = styled.div`
   background: #fff;
@@ -185,158 +177,42 @@ const RenderSwapButton = (account, isSwapable, handleSwap, amount) => {
       disabled={!isSwapable}
       onClick={isSwapable ? () => handleSwap(amount) : null}
     >
-      Swap
+      Swap & Staking
     </StyledButton>
   );
 };
 
-const StakingPackages = [1, 2, 3, 4];
+const StakingPackages = [1, 2, 3];
 
 const TokenSwap = ({
   account,
   onStakingPkgHandler,
-  stakingPkg,
+  onAmountChangeHandler,
   networkId,
-  setDetailClick,
+  tokenSwap,
+  tokenReceive,
+  swapList,
+  receiveList,
+  onTokenSwapChoose,
+  onTokenReceiveChoose,
+  handleApprove,
+  handleSwap,
+  setMaxAmount,
+  state,
 }) => {
-  const {
-    web3,
-    tokenReceive,
-    tokenSwap,
-    swapList,
-    receiveList,
-    onTokenSwapChoose,
-    onTokenReceiveChoose,
-  } = useContext(AppContext);
-
-  const {
-    onSwapHandler,
-    onAprroveCheck,
-    getBalanceOf,
-    getSwapRatio,
-    onApproveHandler,
-  } = useWeb3(web3, account);
-
-  const [amount, setAmount] = useState('');
-  const [isSwapable, setSwapable] = useState(false);
-  const [isApprove, setApprove] = useState(false);
-  const [balanceSwap, setBalanceSwap] = useState(0);
-  const [balanceReceive, setBalanceReceive] = useState(0);
-  const [isLoading, setLoading] = useState(false);
   const [swapModal, setSwapModal] = useState(false);
   const [receiveModal, setReceiveModal] = useState(false);
-  const [ratio, setRatio] = useState(0);
- 
 
-  useEffect(() => {
-    const InitFetch = async () => {
-      try {
-        setLoading(true);
-        await Promise.allSettled([
-          checkApproveToTransfer(),
-          fetchSwapRatio(),
-          getTokensBalance(),
-        ]);
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-    };
-    if (tokenSwap && tokenReceive) {
-      InitFetch();
-    }
-  }, [tokenSwap, tokenReceive]);
-
-  useEffect(() => {
-    checkSwapAmount();
-  }, [amount, balanceSwap]);
-
-  const checkSwapAmount = () => {
-    if (amount > 0 && amount <= balanceSwap) {
-      setSwapable(true);
-      return;
-    }
-    setSwapable(false);
-  };
-
-  
-
-  const checkApproveToTransfer = async () => {
-    try {
-      const approveRes = await onAprroveCheck(tokenSwap.address);
-      setApprove(approveRes);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchSwapRatio = async () => {
-    try {
-      const ratioRes = await getSwapRatio(
-        tokenSwap.address,
-        tokenReceive.address,
-      );
-      setRatio(ratioRes);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getTokensBalance = async () => {
-    try {
-      const [balanceSwapRes, balanceReceiveRes] = await Promise.allSettled([
-        getBalanceOf(tokenSwap.address),
-        getBalanceOf(tokenReceive.address),
-      ]);
-      setBalanceSwap(balanceSwapRes.value);
-      setBalanceReceive(balanceReceiveRes.value);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleApprove = async () => {
-    setLoading(true);
-    try {
-      await onApproveHandler(tokenSwap.address);
-      setApprove(true);
-    } catch (error) {
-      console.log(error);
-    }
-    setLoading(false);
-  };
-
-  const onAmountChangeHandler = (e) => {
-    const newAmount = e.target.value;
-    if (newAmount > balanceSwap) {
-      return;
-    }
-    setAmount(newAmount);
-  };
-
-  const setMaxBalance = () => {
-    setAmount(balanceSwap);
-  };
-
-  const handleSwap = async (amount) => {
-    if (amount > 0) {
-      setLoading(true);
-      try {
-        await onSwapHandler(tokenSwap.address, tokenReceive.address, amount);
-        await checkApproveToTransfer();
-        toast('Transaction successfull!', {
-          position: 'top-center',
-          hideProgressBar: true,
-          autoClose: 2000,
-          type: 'success',
-        });
-        setAmount('');
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-    }
-  };
+  const {
+    balanceSwap,
+    balanceReceive,
+    ratio,
+    amount,
+    stakingPkg,
+    isApprove,
+    isSwapable,
+    isLoading,
+  } = state;
 
   const onSwapModalOpen = () => setSwapModal(true);
   const onReceiveModalOpen = () => setReceiveModal(true);
@@ -351,7 +227,7 @@ const TokenSwap = ({
             <Flex justifyContent="space-between" className="pb-3">
               <StyledInputLabel>From</StyledInputLabel>
               <StyledInputLabel
-                onClick={setMaxBalance}
+                onClick={setMaxAmount}
                 style={{ cursor: 'pointer' }}
               >
                 Balance: {balanceSwap.toFixed(2)}
@@ -429,15 +305,18 @@ const TokenSwap = ({
               <div key={pkg} className="col">
                 <StyledButton
                   outline
-                  className={stakingPkg === pkg ? 'active' : ''}
+                  className={stakingPkg === pkg ? 'btn active' : 'btn '}
                   fontSize="14px"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="Tooltip on top"
                   onClick={() => {
                     onStakingPkgHandler(pkg);
-                    setDetailClick(false);
                   }}
                 >
-                  Staking Package {pkg}
+                  Package {pkg}
                 </StyledButton>
+              
               </div>
             ))}
           </div>
@@ -472,9 +351,8 @@ const TokenSwap = ({
         />
       )}
       <ScreenBlocking isLoading={isLoading} />
-      <ToastContainer />
     </>
   );
 };
 
-export default TokenSwap;
+export default React.memo(TokenSwap);

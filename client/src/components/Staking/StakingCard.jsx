@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import styled from 'styled-components';
 import { Flex, StyledButton } from '../TokenSwap';
 import ChevronDown from '../ChevronDown';
@@ -91,16 +91,28 @@ const detailVariants = {
   },
 };
 
+const STAKING_PACKAGES = {
+  1: '6',
+  2: '24',
+  3: '60',
+};
+
 const StakingCard = ({
   stakingPkg,
-  isDetailClick,
-  setDetailClick,
-  history,
+  isDetailShow,
+  onDetailShowHandler,
+  historyStake,harvestProfit
 }) => {
-  const onDetailClickHandler = () => {
-    setDetailClick((prev) => !prev);
-  };
- 
+  const [historyStakeFilter, setHistoryStakeFilter] = useState([]);
+
+  useEffect(() => {
+    if (historyStake) {
+      const filterHistory = historyStake.filter(
+        (element) => +element.packageId === stakingPkg,
+      );
+      setHistoryStakeFilter(filterHistory);
+    }
+  }, [historyStake, stakingPkg]);
   return (
     <AnimatePresence initial={false}>
       <CardWrapper
@@ -116,16 +128,16 @@ const StakingCard = ({
             <div className="pe-4">
               <StyledImage src="/tokens/BNB_LBNB.png" width="50px" />
               <Text fontSize="20px" fontWeight={600} textTransform="uppercase">
-                PST/PST package: {stakingPkg}
+                PST/PST
               </Text>
             </div>
 
             <Flex justifyContent="space-between" style={{ width: 200 }}>
               <Text textTransform="capitalize" fontWeight={600}>
-                current APR:
+                Package APY:
               </Text>
               <Text textTransform="capitalize" textAlign="end" fontWeight={600}>
-                99%
+                {STAKING_PACKAGES[stakingPkg]}%
               </Text>
             </Flex>
           </StakingHeader>
@@ -177,20 +189,20 @@ const StakingCard = ({
           <Spacer />
           <StyledButton className="success mb-4">Unlock</StyledButton>
           <Flex alignItems="center" justifyContent="center" className="w-100">
-            {history && (
-              <DetailButton onClick={onDetailClickHandler}>
+            {historyStake && (
+              <DetailButton onClick={onDetailShowHandler}>
                 <span>Detail</span>
                 <StyledArrowIcon
                   className="ms-1"
                   width="12px"
-                  $isShow={isDetailClick}
+                  $isShow={isDetailShow}
                 />
               </DetailButton>
             )}
           </Flex>
         </ContentWrapper>
         <AnimatePresence>
-          {isDetailClick && (
+          {isDetailShow && (
             <DetailWrapper
               as={motion.div}
               variants={detailVariants}
@@ -199,14 +211,9 @@ const StakingCard = ({
               exit="hide"
               transition={{ type: 'spring', duration: 0.1 }}
             >
-              {history.map((infor) => (
-                <StakeDetail key={infor.id}  data={infor}/>
+              {historyStakeFilter.map((infor) => (
+                <StakeDetail key={infor.id} data={infor} harvestProfit={harvestProfit} />
               ))}
-
-              {/* <StakeDetail />
-              <StakeDetail />
-              <StakeDetail />
-              <StakeDetail /> */}
             </DetailWrapper>
           )}
         </AnimatePresence>
@@ -215,4 +222,4 @@ const StakingCard = ({
   );
 };
 
-export default StakingCard;
+export default React.memo(StakingCard);
