@@ -193,7 +193,7 @@ const StakingCard = ({
               </Text>
             </div>
             <div className="col-6">
-              <Text fontWeight={500} textAlign="end" className="mb-3">
+              <Text fontWeight={800} color="red" fontSize="16px" textAlign="end" className="mb-3">
                 {PACKAGE_PROFIT[stakingPkg].title}
               </Text>
               <Text fontWeight={500} textAlign="end" className="mb-3">
