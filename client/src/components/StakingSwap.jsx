@@ -54,6 +54,7 @@ const StakingSwap = ({ account, networkId }) => {
     onApproveHandler,
     getHistoryStake,
     harvestProfit,
+    unlockStake
   } = useWeb3(web3, account);
 
   const [state, dispatch] = useReducer(stakeSwapReducer, initialState);
@@ -197,7 +198,24 @@ const StakingSwap = ({ account, networkId }) => {
     dispatch({ type: SET_LOADING, payload: true });
     try {
       const harvestRes = await harvestProfit(profileId);
+      const historyRes = await getHistoryStake();
+      dispatch({ type: SET_HISTORY, payload: historyRes });
+
       console.log('harvestRes:', harvestRes);
+    } catch (error) {
+      console.log(error);
+    }
+    dispatch({ type: SET_LOADING, payload: false });
+  };
+
+  const onUnlockStake = async (profileId) => {
+    dispatch({ type: SET_LOADING, payload: true });
+    try {
+      const harvestRes = await unlockStake(profileId);
+      const historyRes = await getHistoryStake();
+      dispatch({ type: SET_HISTORY, payload: historyRes });
+
+      console.log('onUnlockStake:', harvestRes);
     } catch (error) {
       console.log(error);
     }
@@ -233,6 +251,7 @@ const StakingSwap = ({ account, networkId }) => {
               isDetailShow={isDetailShow}
               historyStake={historyStake}
               onHarvestProfit={onHarvestProfit}
+              onUnlockStake={onUnlockStake}
             />
           </div>
         </div>

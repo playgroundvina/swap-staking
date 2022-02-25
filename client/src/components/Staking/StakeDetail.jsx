@@ -6,7 +6,7 @@ import { Text, StyledImage } from './StakingCard';
 
 const DetailWrapper = styled.div`
   padding: 0 1.5rem 2rem;
-  border-bottom: 1px solid rgb(223, 223, 223);
+  border-bottom: ${({ $isLast }) => ($isLast ? 'none' : '2px solid rgb(223, 223, 223)')} ;
   margin-bottom: 2rem;
 `;
 
@@ -36,10 +36,10 @@ const toLocaleDate = (date) => {
   return new Date(date).toLocaleDateString('en', options);
 };
 
-const StakeDetail = ({ data, onHarvestProfit }) => {
+const StakeDetail = ({ data, onHarvestProfit, onUnlockStake, isLast = false }) => {
   console.log(data);
   return (
-    <DetailWrapper as={motion.div} variants={variants}>
+    <DetailWrapper as={motion.div} variants={variants} $isLast={isLast}>
       <Flex justifyContent="center" className="mb-4">
         <StyledButton
           className="success"
@@ -52,7 +52,14 @@ const StakeDetail = ({ data, onHarvestProfit }) => {
           {' '}
           Harvest{' '}
         </StyledButton>
-        <StyledButton className="success ms-3" fontSize="14px">
+        <StyledButton 
+          className="success ms-3" 
+          fontSize="14px"
+          disabled={data?.stakeUnlocked <= 0}
+          onClick={
+            data?.stakeUnlocked > 0 ? () => onUnlockStake(data?.id) : null
+          }
+        >
           {' '}
           Unlock Stake{' '}
         </StyledButton>
@@ -63,7 +70,7 @@ const StakeDetail = ({ data, onHarvestProfit }) => {
       </Flex>
       <Flex justifyContent="space-between" className="mb-2">
         <Text>Total Earned Value :</Text>
-        <Text>{data?.profitCanClaim}</Text>
+        <Text>{data?.profitClaimed + data?.stakeClaimed}</Text>
       </Flex>
       <Flex justifyContent="space-between" className="mb-2">
         <Text>Stake unlock: </Text>
@@ -76,7 +83,7 @@ const StakeDetail = ({ data, onHarvestProfit }) => {
         <Text>Earned value </Text>
         <Flex alignItems="center">
           <StyledImage src="/tokens/PST.svg" width="16px" />
-          <Text className="ps-2">{data?.stakeClaimed}</Text>
+          <Text className="ps-2">{data?.profitCanClaim}</Text>
         </Flex>
       </Flex>
       <Flex justifyContent="center">
@@ -85,9 +92,9 @@ const StakeDetail = ({ data, onHarvestProfit }) => {
             {toLocaleDate(+data?.vestingStart * 1000)}{' '}
           </Text>
 
-          <Text className="text-align-center" fontWeight={700}>
+          {/* <Text className="text-align-center" fontWeight={700}>
             {toLocaleDate(+data?.vestingEnd * 1000)}{' '}
-          </Text>
+          </Text> */}
         </div>
       </Flex>
     </DetailWrapper>

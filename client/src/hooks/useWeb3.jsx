@@ -163,6 +163,7 @@ const useWeb3 = (web3, account) => {
     onApproveHandler,
     getHistoryStake,
     harvestProfit,
+    unlockStake
   };
 };
 

@@ -64,6 +64,11 @@ const DetailWrapper = styled.div`
   -ms-overflow-style: none;
   scrollbar-width: none;
 `;
+
+const TextRule = styled(Text)`
+  line-height: 1.5;
+`
+
 const cardVariants = {
   show: {
     opacity: 1,
@@ -101,12 +106,36 @@ const STAKING_PACKAGES = {
   3: '60',
 };
 
+const PACKAGE_PROFIT = {
+  1: {
+    earningRate: 6,
+    apr: 24,
+    timeLock: 9,
+    title: '3 Months'
+  },
+  2: {
+    earningRate: 24,
+    apr: 48,
+    timeLock: 6,
+    title: '6 Months'
+  },
+  3: {
+    earningRate: 60,
+    apr: 60,
+    timeLock: 12,
+    title: '12 Months'
+
+  },
+};
+
+
 const StakingCard = ({
   stakingPkg,
   isDetailShow,
   onDetailShowHandler,
   historyStake,
   onHarvestProfit,
+  onUnlockStake
 }) => {
   const [historyStakeFilter, setHistoryStakeFilter] = useState([]);
 
@@ -134,7 +163,7 @@ const StakingCard = ({
             <div className="pe-4">
               <StyledImage src="/tokens/BNB_LBNB.png" width="50px" />
               <Text fontSize="20px" fontWeight={600} textTransform="uppercase">
-                PST/PST
+                CHTS/CHTS
               </Text>
             </div>
 
@@ -143,57 +172,38 @@ const StakingCard = ({
                 Package APY:
               </Text>
               <Text textTransform="capitalize" textAlign="end" fontWeight={600}>
-                {STAKING_PACKAGES[stakingPkg]}%
+              {`${PACKAGE_PROFIT[stakingPkg].apr}%`}
               </Text>
             </Flex>
           </StakingHeader>
-          {/* <StakingInfor className="mb-3 row">
+          <Text textTransform="capitalize" fontWeight={600} fontSize={'25px'} textAlign="center" className="my-5">
+                STAKE CHTS TO EARN CHTS
+              </Text>
+          <StakingInfor className="mb-3 row">
+
             <div className="col-6">
               <Text fontWeight={500} className="mb-3">
-                My Stake
+                Package
               </Text>
               <Text fontWeight={500} className="mb-3">
-                My Pending Rewards
+                Earning Rate
               </Text>
               <Text fontWeight={500} className="mb-3">
-                Total Stake
-              </Text>
-              <Text fontWeight={500} className="mb-3">
-                Wallet Balance
+                *Rule
               </Text>
             </div>
-            <div className="col-2">
-              <Text color="#b1b1b1" className="mb-3">
-                0
+            <div className="col-6">
+              <Text fontWeight={500} textAlign="end" className="mb-3">
+                {PACKAGE_PROFIT[stakingPkg].title}
               </Text>
-              <Text color="#b1b1b1" className="mb-3">
-                0.00
+              <Text fontWeight={500} textAlign="end" className="mb-3">
+              {`${PACKAGE_PROFIT[stakingPkg].earningRate}%`}
               </Text>
-              <Text color="#b1b1b1" className="mb-3">
-                $0.000
-              </Text>
-              <Text color="#b1b1b1" className="mb-3">
-                0
-              </Text>
+              <TextRule fontWeight={500} textAlign="end" className="mb-3">
+                {`Cancel The Lockup After ${PACKAGE_PROFIT[stakingPkg].title} Of Staking (Principal After For ${PACKAGE_PROFIT[stakingPkg].timeLock} Month)`}
+              </TextRule>
             </div>
-            <div className="col-4">
-              <Text fontWeight={500} textAlign="end" className="mb-3">
-                PST/PST
-              </Text>
-              <Text fontWeight={500} textAlign="end" className="mb-3">
-                PST
-              </Text>
-              <div></div>
-              <Text fontWeight={500} textAlign="end" className="mb-3">
-                0
-              </Text>
-              <Text fontWeight={500} textAlign="end" className="mb-3">
-                PST/PST
-              </Text>
-            </div>
-          </StakingInfor> */}
-          <Spacer />
-          <StyledButton className="success mb-4">Unlock</StyledButton>
+          </StakingInfor>
           <Flex alignItems="center" justifyContent="center" className="w-100">
             {historyStakeFilter.length > 0 && (
               <DetailButton onClick={onDetailShowHandler}>
@@ -217,11 +227,13 @@ const StakingCard = ({
               exit="hide"
               transition={{ type: 'spring', duration: 0.1 }}
             >
-              {historyStakeFilter.map((infor) => (
+              {historyStakeFilter.map((infor, index) => (
                 <StakeDetail
                   key={infor.id}
                   data={infor}
                   onHarvestProfit={onHarvestProfit}
+                  onUnlockStake={onUnlockStake}
+                  isLast={index == historyStakeFilter.length - 1}
                 />
               ))}
             </DetailWrapper>
