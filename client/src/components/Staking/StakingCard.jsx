@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Flex, StyledButton } from '../TokenSwap';
 import ChevronDown from '../ChevronDown';
@@ -101,7 +101,8 @@ const StakingCard = ({
   stakingPkg,
   isDetailShow,
   onDetailShowHandler,
-  historyStake,harvestProfit
+  historyStake,
+  onHarvestProfit,
 }) => {
   const [historyStakeFilter, setHistoryStakeFilter] = useState([]);
 
@@ -189,7 +190,7 @@ const StakingCard = ({
           <Spacer />
           <StyledButton className="success mb-4">Unlock</StyledButton>
           <Flex alignItems="center" justifyContent="center" className="w-100">
-            {historyStake && (
+            {historyStakeFilter.length > 0 && (
               <DetailButton onClick={onDetailShowHandler}>
                 <span>Detail</span>
                 <StyledArrowIcon
@@ -212,7 +213,11 @@ const StakingCard = ({
               transition={{ type: 'spring', duration: 0.1 }}
             >
               {historyStakeFilter.map((infor) => (
-                <StakeDetail key={infor.id} data={infor} harvestProfit={harvestProfit} />
+                <StakeDetail
+                  key={infor.id}
+                  data={infor}
+                  onHarvestProfit={onHarvestProfit}
+                />
               ))}
             </DetailWrapper>
           )}

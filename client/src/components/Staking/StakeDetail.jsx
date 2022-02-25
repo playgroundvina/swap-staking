@@ -35,14 +35,18 @@ const toLocaleDate = (date) => {
   return new Date(date).toLocaleDateString('en', options);
 };
 
-const StakeDetail = ({ data, harvestProfit }) => {
+const StakeDetail = ({ data, onHarvestProfit }) => {
+  console.log(data);
   return (
     <DetailWrapper as={motion.div} variants={variants}>
       <Flex justifyContent="center" className="mb-4">
         <StyledButton
           className="success"
           fontSize="14px"
-          onClick={() => harvestProfit(data?.id)}
+          disabled={data?.profitCanClaim <= 0}
+          onClick={
+            data?.profitCanClaim > 0 ? () => onHarvestProfit(data?.id) : null
+          }
         >
           {' '}
           Harvest{' '}

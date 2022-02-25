@@ -47,12 +47,7 @@ const useWeb3 = (web3, account) => {
     return +ratioRes / 1000;
   };
 
-  const onSwapHandler = async (
-    token0Address,
-    token1Address,
-    amount,
-    pkgId
-  ) => {
+  const onSwapHandler = async (token0Address, token1Address, amount, pkgId) => {
     const swapContract = getSwapStakingContract(web3);
 
     await swapContract.methods
@@ -137,21 +132,24 @@ const useWeb3 = (web3, account) => {
   const harvestProfit = async (profileId) => {
     try {
       const contract = getSwapStakingContract(web3);
-      const data = await contract.methods.claimStaking(profileId).call();
-      console.log('data:', data)
-      
+      return await contract.methods
+        .claimProfit(profileId)
+        .send({ from: account });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const unlockStake = async () => {
     try {
-      
+      const contract = getSwapStakingContract(web3);
+      return await contract.methods
+        .claimStaking(profileId)
+        .send({ from: account });
     } catch (error) {
-      
+      console.log(error);
     }
-  }
+  };
 
   const convertToWeii = (amount) => web3.utils.toWei(amount);
   const convertToTokens = (amount) => {
@@ -164,7 +162,7 @@ const useWeb3 = (web3, account) => {
     getSwapRatio,
     onApproveHandler,
     getHistoryStake,
-    harvestProfit
+    harvestProfit,
   };
 };
 

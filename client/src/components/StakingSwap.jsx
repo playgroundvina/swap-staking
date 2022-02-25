@@ -53,7 +53,7 @@ const StakingSwap = ({ account, networkId }) => {
     getSwapRatio,
     onApproveHandler,
     getHistoryStake,
-    harvestProfit
+    harvestProfit,
   } = useWeb3(web3, account);
 
   const [state, dispatch] = useReducer(stakeSwapReducer, initialState);
@@ -64,11 +64,13 @@ const StakingSwap = ({ account, networkId }) => {
     const InitFetch = async () => {
       try {
         dispatch({ type: SET_LOADING, payload: true });
-        await Promise.allSettled([
+        const [historyRes] = await Promise.allSettled([
+          getHistoryStake(),
           checkApproveToTransfer(),
           fetchSwapRatio(),
           getTokensBalance(),
         ]);
+        dispatch({ type: SET_HISTORY, payload: historyRes.value });
       } catch (error) {
         console.log(error);
       }
@@ -80,22 +82,19 @@ const StakingSwap = ({ account, networkId }) => {
   }, [tokenSwap, tokenReceive]);
 
   useEffect(() => {
-    const getHistory = async () => {
-      try {
-        const historyRes = await getHistoryStake();
-        console.log('historyRes:', historyRes)
-
-        dispatch({ type: SET_HISTORY, payload: historyRes });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    if (account) getHistory();
-  }, [account]);
-
-  useEffect(() => {
     checkSwapAmount();
   }, [amount, balanceSwap]);
+
+  const onAmountChangeHandler = (e) => {
+    const newAmount = e.target.value;
+    if (newAmount > balanceSwap) {
+      return;
+    }
+    dispatch({ type: SET_AMOUNT, payload: e.target.value });
+  };
+
+  const setMaxAmount = () =>
+    dispatch({ type: SET_AMOUNT, payload: balanceSwap });
 
   const checkSwapAmount = () => {
     if (amount > 0 && amount <= balanceSwap) {
@@ -104,6 +103,14 @@ const StakingSwap = ({ account, networkId }) => {
     }
     dispatch({ type: SET_SWAPABLE, payload: false });
   };
+
+  const onStakingPkgHandler = (pkg) => {
+    dispatch({ type: SET_PKG, payload: pkg });
+    dispatch({ type: SET_DETAIL_SHOW, payload: false });
+  };
+
+  const onDetailShowHandler = () =>
+    dispatch({ type: SET_DETAIL_SHOW, payload: !isDetailShow });
 
   const checkApproveToTransfer = async () => {
     try {
@@ -170,6 +177,7 @@ const StakingSwap = ({ account, networkId }) => {
           stakingPkg,
         );
         await checkApproveToTransfer();
+        const historyRes = await getHistoryStake();
         toast('Transaction successfull!', {
           position: 'top-right',
           hideProgressBar: true,
@@ -177,6 +185,7 @@ const StakingSwap = ({ account, networkId }) => {
           type: 'success',
         });
         dispatch({ type: SET_AMOUNT, payload: '' });
+        dispatch({ type: SET_HISTORY, payload: historyRes });
       } catch (error) {
         console.log(error);
       }
@@ -184,24 +193,16 @@ const StakingSwap = ({ account, networkId }) => {
     }
   };
 
-  const onStakingPkgHandler = (pkg) => {
-    dispatch({ type: SET_PKG, payload: pkg });
-    dispatch({ type: SET_DETAIL_SHOW, payload: false });
-  };
-
-  const onDetailShowHandler = () =>
-    dispatch({ type: SET_DETAIL_SHOW, payload: !isDetailShow });
-
-  const onAmountChangeHandler = (e) => {
-    const newAmount = e.target.value;
-    if (newAmount > balanceSwap) {
-      return;
+  const onHarvestProfit = async (profileId) => {
+    dispatch({ type: SET_LOADING, payload: true });
+    try {
+      const harvestRes = await harvestProfit(profileId);
+      console.log('harvestRes:', harvestRes);
+    } catch (error) {
+      console.log(error);
     }
-    dispatch({ type: SET_AMOUNT, payload: e.target.value });
+    dispatch({ type: SET_LOADING, payload: false });
   };
-
-  const setMaxAmount = () =>
-    dispatch({ type: SET_AMOUNT, payload: balanceSwap });
 
   return (
     <main className="overflow-hidden container">
@@ -231,7 +232,7 @@ const StakingSwap = ({ account, networkId }) => {
               onDetailShowHandler={onDetailShowHandler}
               isDetailShow={isDetailShow}
               historyStake={historyStake}
-              harvestProfit={harvestProfit}
+              onharvestProfit={onHarvestProfit}
             />
           </div>
         </div>
