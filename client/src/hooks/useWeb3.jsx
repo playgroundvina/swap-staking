@@ -140,7 +140,7 @@ const useWeb3 = (web3, account) => {
     }
   };
 
-  const unlockStake = async () => {
+  const unlockStake = async (profileId) => {
     try {
       const contract = getSwapStakingContract(web3);
       return await contract.methods

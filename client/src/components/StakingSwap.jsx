@@ -206,8 +206,8 @@ const StakingSwap = ({ account, networkId }) => {
 
   return (
     <main className="overflow-hidden container">
-      <MainWrapper className=" w-100 my-5">
-        <div className="row position-relative gy-4 gy-md-0">
+      <MainWrapper className="d-flex my-5">
+        <div className="row w-100 position-relative gy-4 gy-md-0 m-auto">
           <div className="col col-md-5 mx-auto">
             <TokenSwap
               account={account}
@@ -232,7 +232,7 @@ const StakingSwap = ({ account, networkId }) => {
               onDetailShowHandler={onDetailShowHandler}
               isDetailShow={isDetailShow}
               historyStake={historyStake}
-              onharvestProfit={onHarvestProfit}
+              onHarvestProfit={onHarvestProfit}
             />
           </div>
         </div>

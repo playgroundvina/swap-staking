@@ -129,6 +129,8 @@ const SelectTokenBox = styled(StyledButton)`
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height:40px;
+  ${({ hide }) => hide && `opacity:0;cursor:default;z-index-1;`}
 `;
 
 export const RenderConnectButton = (account) => {
@@ -284,20 +286,21 @@ const TokenSwap = ({
                 readOnly
                 value={amount * ratio}
               />
-              {tokenReceive && (
+              {/* {tokenReceive && ( */}
                 <SelectTokenBox
                   className="col-5 success"
-                  onClick={onReceiveModalOpen}
+                  onClick={tokenReceive ? onReceiveModalOpen : null}
+                  hide={!tokenReceive}
                 >
                   <StyledImg
-                    src={`/tokens/${tokenReceive.name}.svg`}
+                    src={`/tokens/${tokenReceive?.name}.svg`}
                     width="24px"
                     className="me-1"
                   />
-                  {tokenReceive.name}{' '}
+                  {tokenReceive?.name}{' '}
                   <ChevronDown width="12px" className="ms-2" />
                 </SelectTokenBox>
-              )}
+             
             </Flex>
           </InputTokenWrapper>{' '}
           <div className="row mt-5 mb-3">
@@ -316,7 +319,6 @@ const TokenSwap = ({
                 >
                   Package {pkg}
                 </StyledButton>
-              
               </div>
             ))}
           </div>

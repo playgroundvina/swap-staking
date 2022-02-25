@@ -11,7 +11,7 @@ const CardWrapper = styled.div`
   box-shadow: 0 5px 8px 1px rgba(0, 0, 0, 0.1);
   width: 100%;
   position: relative;
-  min-height: 470px;
+  min-height: 485px;
 `;
 
 const Spacer = styled.div`
@@ -73,6 +73,10 @@ const cardVariants = {
     opacity: 0,
     x: 20,
   },
+  exit: {
+    opacity: 0,
+    x: -20,
+  },
 };
 
 const detailVariants = {
@@ -121,6 +125,7 @@ const StakingCard = ({
         variants={cardVariants}
         animate="show"
         initial="hide"
+
         transition={{ duration: 0.4 }}
         key={stakingPkg}
       >

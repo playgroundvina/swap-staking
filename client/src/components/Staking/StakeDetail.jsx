@@ -18,6 +18,7 @@ const variants = {
   hide: {
     y: '-10%',
     opacity: 0,
+    
   },
 };
 
