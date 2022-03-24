@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Flex } from './TokenSwap';
+import { Flex } from '../TokenSwap';
 
 const TokenImg = styled.img`
   width: ${({ width }) => width ?? '100%'};

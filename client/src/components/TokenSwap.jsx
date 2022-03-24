@@ -1,29 +1,33 @@
-import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
-import ArrowDown from './ArrowDown';
-import ChevronDown from './ChevronDown';
-import ModalSwap from './Modal';
-import ModalReceive from './Modal';
-import useMetamask from '../hooks/useMetamask';
-import ScreenBlocking from './ScreenBlocking';
+import React from 'react';
+import styled from 'styled-components';
+import ChevronDown from './Icons/ChevronDown';
+import SwapIcon from './Icons/SwapIcon';
 
 const SwapBoard = styled.div`
   background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 10px 10px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px 0px #00000040;
+  max-width: 450px;
+  width: 95%;
+  margin: 0 auto;
   padding: 2rem 1rem 1rem;
-  border: 1px solid rgba(136, 204, 253, 0.5);
 `;
 
 const BoardWrapper = styled.div`
   margin: auto;
 `;
 
-const Text = styled.p`
+export const Text = styled.p`
   margin-left: 8px;
-  color: ${({ color }) => color ?? 'rgb(136,204,253)'};
+  color: ${({ color }) => color ?? '#000'};
   font-weight: ${({ fontWeight }) => fontWeight ?? '700'};
-  font-size: ${({ fontSize }) => fontSize ?? '32px'};
+  font-size: ${({ fontSize }) => fontSize ?? '34px'};
+  ${({ textTransform }) => textTransform && `text-transform:${textTransform};`}
+  ${({ fontFamily }) =>
+    fontFamily === 'Playfair' && 'font-family: Playfair Display SC;'}
+  line-height: ${({ lineHeight }) => lineHeight ?? 1};
+  text-align: ${({ textAlign }) => textAlign ?? 'start'};
+  ${({ mb }) => mb && `margin-bottom: ${mb};`}
   ${({ truncate }) =>
     truncate &&
     `
@@ -31,6 +35,13 @@ const Text = styled.p`
     white-space:nowrap;
     overflow:hidden;
     width:150px;
+    `}
+    ${({ linear }) =>
+    linear &&
+    `
+    background: linear-gradient(214.02deg, #D71479 6.04%, #F87421 92.95%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
     `}
 `;
 
@@ -40,19 +51,22 @@ const StyledImg = styled.img`
 `;
 
 export const StyledButton = styled.div`
-  --main-color: rgb(17, 153, 250);
-  background: rgb(136, 204, 253);
+  --main-color: linear-gradient(214.02deg, #d71479 6.04%, #f87421 92.95%);
+  outline: none;
+
+  background: var(--main-color);
   border-radius: 20px;
   color: #fff;
   text-transform: capitalize;
   font-weight: 600;
   padding: 1rem;
-  transition: 0.2s ease-out;
+  transition: 0.1s ease-out;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+  border-radius: 30px;
   font-size: ${({ fontSize }) => fontSize ?? '16px'};
   &.success {
     background: var(--main-color);
@@ -60,36 +74,39 @@ export const StyledButton = styled.div`
   }
   ${({ disabled }) =>
     disabled
-      ? `background:rgb(136,204,253) !important;
+      ? `opacity:0.6;
   cursor:not-allowed;`
       : ` &:hover {
     color: #fff;
     filter: brightness(1.03);
   }`}
-  ${({ outline }) =>
-    outline &&
-    css`
-      background: transparent !important;
-      border: 1px solid var(--main-color);
-      color: var(--main-color);
-      border-radius: 10px;
+`;
 
-      :hover {
-        background: var(--main-color) !important ;
-      }
-      &.active {
-        background: var(--main-color) !important;
-        color: #fff;
-      }
-    `}
+export const OutlineButton = styled(StyledButton)`
+  border-radius: 30px;
+  background: rgb(247, 248, 250);
+  position: relative;
+  color: #ed1c51;
+
+  :before {
+    border-radius: 30px;
+    position: absolute;
+    content: '';
+    background: linear-gradient(214.02deg, #d71479 6.04%, #f87421 92.95%);
+    top: -2px;
+    left: -2px;
+    bottom: -2px;
+    right: -2px;
+    position: absolute;
+    z-index: -1;
+  }
 `;
 
 const InputTokenWrapper = styled.div`
   text-align: left;
-  border-radius: 20px;
   padding: 0.75rem;
-  border: 1px solid #e6e6e6;
-  margin-bottom: 1rem;
+  border: 1px solid rgba(196, 196, 196, 0.5);
+  /* margin-bottom: 1rem; */
 `;
 
 export const Flex = styled.div`
@@ -129,102 +146,140 @@ const SelectTokenBox = styled(StyledButton)`
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height:40px;
-  ${({ hide }) => hide && `opacity:0;cursor:default;z-index-1;`}
+  min-height: 40px;
+  color: #000;
+  background: transparent;
+  border: 1px solid #000;
+
+  ${({ disabled }) =>
+    disabled
+      ? `opacity:0.4;`
+      : `:hover {
+    opacity: 0.7;
+    color: #000;
+  }`}
+  ${({ hide }) => hide && `display:none;`}
 `;
 
-export const RenderConnectButton = (account) => {
-  const { handleConnect } = useMetamask();
-  if (!account)
-    return (
-      <StyledButton className="success" onClick={handleConnect}>
-        Connect Wallet
-      </StyledButton>
-    );
-  return (
-    <Text fontSize="16px" color="#333">
-      {account.slice(0, 5)}...{account.slice(-5)}
-    </Text>
-  );
-};
+const SwapLine = styled(Flex)`
+  position: relative;
+  :before {
+    position: absolute;
+    content: '';
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 1px;
+    background: #1c1924;
+  }
+`;
 
-const RenderApproveButton = (account, handleApprove, tokenSwap, networkId) => {
-  const { handleConnect } = useMetamask();
+const RenderApproveButton = (
+  account,
+  handleApprove,
+  tokenSwap,
+  networkId,
+  handleConnect,
+  isLoading,
+) => {
   if (!account)
-    return (
-      <StyledButton className="success" onClick={handleConnect}>
-        Connect Wallet
-      </StyledButton>
-    );
+    return <StyledButton onClick={handleConnect}>Connect Wallet</StyledButton>;
   return (
     <StyledButton
-      className="success"
-      disabled={!tokenSwap || networkId !== 4}
-      onClick={tokenSwap && networkId === 4 ? handleApprove : null}
+      disabled={!tokenSwap || networkId !== 4 || isLoading}
+      onClick={
+        tokenSwap && networkId === 4 && !isLoading ? handleApprove : null
+      }
     >
       Approve
     </StyledButton>
   );
 };
 
-const RenderSwapButton = (account, isSwapable, handleSwap, amount) => {
-  const { handleConnect } = useMetamask();
+const RenderSwapButton = (
+  account,
+  isSwapable,
+  handleSwap,
+  amount,
+  tokenAddress,
+  handleConnect,
+  isLoading,
+) => {
   return !account ? (
-    <StyledButton className="success" onClick={handleConnect}>
-      Connect Wallet
-    </StyledButton>
+    <StyledButton onClick={handleConnect}>Connect Wallet</StyledButton>
   ) : (
     <StyledButton
-      className="success"
-      disabled={!isSwapable}
-      onClick={isSwapable ? () => handleSwap(amount) : null}
+      disabled={!isSwapable || isLoading}
+      onClick={
+        isSwapable && !isLoading
+          ? () => handleSwap(amount, account, tokenAddress)
+          : null
+      }
     >
-      Swap & Staking
+      Swap & Lock
     </StyledButton>
   );
 };
 
-const StakingPackages = [1, 2, 3];
-
 const TokenSwap = ({
   account,
-  onStakingPkgHandler,
   onAmountChangeHandler,
   networkId,
   tokenSwap,
-  tokenReceive,
-  swapList,
-  receiveList,
-  onTokenSwapChoose,
-  onTokenReceiveChoose,
   handleApprove,
+  tokenReceive,
+  onSwapModalOpen,
+  onReceiveModalOpen,
   handleSwap,
   setMaxAmount,
   state,
+  handleConnect,
 }) => {
-  const [swapModal, setSwapModal] = useState(false);
-  const [receiveModal, setReceiveModal] = useState(false);
-
   const {
     balanceSwap,
     balanceReceive,
     ratio,
     amount,
-    stakingPkg,
-    isApprove,
     isSwapable,
+    isApprove,
     isLoading,
   } = state;
-
-  const onSwapModalOpen = () => setSwapModal(true);
-  const onReceiveModalOpen = () => setReceiveModal(true);
-  const handleSwapModalClose = () => setSwapModal(false);
-  const handleReceiveModalClose = () => setReceiveModal(false);
 
   return (
     <>
       <BoardWrapper>
+        <Text
+          color="#000"
+          fontFamily="Playfair"
+          fontWeight="900"
+          fontSize="34px"
+          textTransform="uppercase"
+          textAlign="center"
+          lineHeight="40px"
+          mb="12px"
+        >
+          Token Swap{' '}
+        </Text>
+        <Text
+          color="#808080"
+          textAlign="center"
+          fontSize="20px"
+          fontWeight="400"
+          mb="34px"
+        >
+          The best place to swap old token to new token
+        </Text>
         <SwapBoard>
+          <Flex>
+            <Text
+              color="#000"
+              fontSize="22px"
+              style={{ marginBottom: 16 }}
+              className="ms-0 mb-4"
+            >
+              Swap
+            </Text>
+          </Flex>
           <InputTokenWrapper>
             <Flex justifyContent="space-between" className="pb-3">
               <StyledInputLabel>From</StyledInputLabel>
@@ -232,7 +287,7 @@ const TokenSwap = ({
                 onClick={setMaxAmount}
                 style={{ cursor: 'pointer' }}
               >
-                Balance: {balanceSwap.toFixed(2)}
+                Balance: {balanceSwap?.toFixed(2)}
               </StyledInputLabel>
             </Flex>
             <Flex>
@@ -246,7 +301,7 @@ const TokenSwap = ({
                 readOnly={balanceSwap === 0}
               />
               <SelectTokenBox
-                className="col-5 success"
+                className="col-5"
                 onClick={account && networkId === 4 ? onSwapModalOpen : null}
                 disabled={!account || networkId !== 4}
               >
@@ -267,15 +322,16 @@ const TokenSwap = ({
               </SelectTokenBox>
             </Flex>
           </InputTokenWrapper>
-          <Flex justifyContent="center " className="mb-4">
-            <ArrowDown width="16px" className="me-1" />
-            Ratio : {ratio}
-          </Flex>
+          <SwapLine justifyContent="center" className="my-2">
+            <SwapIcon width="45px" style={{ zIndex: 1 }} />
+
+            {/* Ratio : {ratio} */}
+          </SwapLine>
           <InputTokenWrapper>
             <Flex justifyContent="space-between" className="pb-3">
               <StyledInputLabel>To (estimated)</StyledInputLabel>
               <StyledInputLabel>
-                Balance: {balanceReceive.toFixed(2)}
+                {/* Balance: {balanceReceive?.toFixed(2)} */}
               </StyledInputLabel>
             </Flex>
             <Flex>
@@ -284,75 +340,46 @@ const TokenSwap = ({
                 placeholder="0.00"
                 className="col-7"
                 readOnly
-                value={amount * ratio}
+                value={amount > 0 ? amount * ratio : 0}
               />
-              {/* {tokenReceive && ( */}
-                <SelectTokenBox
-                  className="col-5 success"
-                  onClick={tokenReceive ? onReceiveModalOpen : null}
-                  hide={!tokenReceive}
-                >
-                  <StyledImg
-                    src={`/tokens/${tokenReceive?.name}.svg`}
-                    width="24px"
-                    className="me-1"
-                  />
-                  {tokenReceive?.name}{' '}
-                  <ChevronDown width="12px" className="ms-2" />
-                </SelectTokenBox>
-             
+
+              <SelectTokenBox
+                className="col-5"
+                onClick={tokenReceive ? onReceiveModalOpen : null}
+                hide={!tokenReceive}
+              >
+                <StyledImg
+                  src={`/tokens/${tokenReceive?.name}.svg`}
+                  width="24px"
+                  className="me-1"
+                />
+                {tokenReceive?.name}{' '}
+                <ChevronDown width="12px" className="ms-2" />
+              </SelectTokenBox>
             </Flex>
           </InputTokenWrapper>{' '}
-          <div className="row mt-5 mb-3">
-            {StakingPackages.map((pkg) => (
-              <div key={pkg} className="col">
-                <StyledButton
-                  outline
-                  className={stakingPkg === pkg ? 'btn active' : 'btn '}
-                  fontSize="14px"
-                  data-toggle="tooltip"
-                  data-placement="top"
-                  title="Tooltip on top"
-                  onClick={() => {
-                    onStakingPkgHandler(pkg);
-                  }}
-                >
-                  Package {pkg}
-                </StyledButton>
-              </div>
-            ))}
-          </div>
-          <div className="mb-3">
+          <div className="my-4 mx-3">
             {!isApprove
               ? RenderApproveButton(
                   account,
                   handleApprove,
                   tokenSwap,
                   networkId,
+                  handleConnect,
+                  isLoading,
                 )
-              : RenderSwapButton(account, isSwapable, handleSwap, amount)}
+              : RenderSwapButton(
+                  account,
+                  isSwapable,
+                  handleSwap,
+                  amount,
+                  tokenSwap?.address,
+                  handleConnect,
+                  isLoading,
+                )}
           </div>
         </SwapBoard>
       </BoardWrapper>
-
-      <ModalSwap
-        title="Select a token to swap"
-        isActive={swapModal}
-        handleClose={handleSwapModalClose}
-        tokenList={swapList}
-        onTokenChoose={onTokenSwapChoose}
-      />
-
-      {tokenReceive && (
-        <ModalReceive
-          title="Select a token to receive"
-          isActive={receiveModal}
-          handleClose={handleReceiveModalClose}
-          tokenList={receiveList}
-          onTokenChoose={onTokenReceiveChoose}
-        />
-      )}
-      <ScreenBlocking isLoading={isLoading} />
     </>
   );
 };

@@ -1,5 +1,4 @@
-import React, { createContext, useState } from 'react';
-import ConvertToken from './contracts/ConvertToken.json';
+import React, { createContext, useState, useEffect } from 'react';
 import getWeb3 from './getWeb3';
 import tokenList from './config/tokens.json';
 
@@ -26,7 +25,6 @@ const AppContextProvider = ({ children }) => {
   const [hasAccountChanged, setHasAccountChanged] = useState(false);
   const [history, setHistory] = useState(null);
 
-
   const onTokenSwapChoose = (address) => {
     const newTokenSwap = swapList.find(
       (element) => element.address === address,
@@ -42,18 +40,66 @@ const AppContextProvider = ({ children }) => {
     setTokenReceive(newToken);
   };
 
-  React.useEffect(() => {
+  const handleConnect = async () => {
+    const accounts = await web3.eth.getAccounts();
+    if (accounts.length > 0) {
+      setAccount(accounts[0]);
+      return;
+    }
+    window.ethereum.enable();
+  };
+
+  const handleLogout = () => {
+    setAccount(null);
+    setTokenSwap(null);
+    setTokenReceive(null);
+    setReceiveList(null);
+  };
+  const switchNetworkHandler = async (chainId) => {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: `0x${Number(chainId).toString(16)}` }],
+      });
+    } catch (error) {
+      // if (error.code === 4902) {
+      //   try {
+      //     await web3.currentProvider.request({
+      //       method: 'wallet_addEthereumChain',
+      //       params: [
+      //         {
+      //           chainId: `0x${Number(chainId).toString(16)}`,
+      //           chainName: 'Rinkeby',
+      //           rpcUrls: ['https://rpc-mumbai.matic.today'],
+      //           nativeCurrency: {
+      //             name: 'Matic',
+      //             symbol: 'Matic',
+      //             decimals: 18,
+      //           },
+      //           blockExplorerUrls: ['https://explorer-mumbai.maticvigil.com'],
+      //         },
+      //       ],
+      //     });
+      //   } catch (error) {
+      //     alert(error.message);
+      //   }
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
     const init = async () => {
       if (window.ethereum) {
         const web3 = await getWeb3();
         setWeb3(web3);
         const networkId = await web3.eth.net.getId();
+        const accounts = await web3.eth.getAccounts();
+        if (accounts) {
+          setAccount(accounts[0]);
+        }
         setNetworkId(networkId);
-        const [selectedAccount] = await web3.eth.getAccounts();
-        setAccount(web3.utils.toChecksumAddress(selectedAccount));
         window.ethereum.on('accountsChanged', (accounts) => {
           setHasAccountChanged(true);
-
           if (!accounts[0]) {
             setHasWalletAddress(false);
             setAccount(null);
@@ -62,6 +108,7 @@ const AppContextProvider = ({ children }) => {
             setReceiveList(null);
           } else {
             setHasWalletAddress(true);
+
             setAccount(accounts[0]);
           }
         });
@@ -70,6 +117,7 @@ const AppContextProvider = ({ children }) => {
         );
       }
     };
+
     init();
   }, []);
 
@@ -77,6 +125,9 @@ const AppContextProvider = ({ children }) => {
     <AppContext.Provider
       value={{
         account,
+        handleConnect,
+        handleLogout,
+        switchNetworkHandler,
         networkId,
         receiveList,
         swapList,
@@ -85,6 +136,7 @@ const AppContextProvider = ({ children }) => {
         onTokenSwapChoose,
         onTokenReceiveChoose,
         web3,
+        hasAccountChanged
       }}
     >
       {children}

@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import TokenInfor from './TokenInfor';
-import _ from 'lodash';
 
 const Wrapper = styled.div`
   /* overflow: scroll; */
+
 `;
 
 const TokenList = ({ searchInput, handleClose, tokenList, onTokenChoose }) => {
@@ -25,7 +25,6 @@ const TokenList = ({ searchInput, handleClose, tokenList, onTokenChoose }) => {
           data={token}
           onTokenChoose={onTokenChoose}
           handleClose={handleClose}
-          onTokenChoose={onTokenChoose}
         />
       ))}
     </Wrapper>

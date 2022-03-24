@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Flex, StyledButton } from '../TokenSwap';
-import ChevronDown from '../ChevronDown';
+import { Flex } from '../TokenSwap';
+import ChevronDown from '../Icons/ChevronDown';
 import StakeDetail from './StakeDetail';
 import { AnimatePresence, motion } from 'framer-motion';
 

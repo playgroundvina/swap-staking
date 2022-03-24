@@ -1,47 +1,24 @@
-import React, { Component, useContext, useState, useEffect } from 'react';
+import React, { useContext, useEffect, lazy, Suspense } from 'react';
 import getWeb3 from './getWeb3';
-import Admin from './components/Admin';
-import {
-  RenderConnectButton,
-  Flex,
-  StyledButton,
-} from './components/TokenSwap';
-import StakingSwap from './components/StakingSwap';
 import './App.css';
 import GlobalStyled from './GlobalStyled';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route} from 'react-router-dom';
 import { AppContext } from './AppContext';
-import Staking from './components/Staking';
 import styled from 'styled-components';
-import useMetamask from './hooks/useMetamask';
 
-const Navbar = styled.div`
-  height: 80px;
-  position: sticky;
-  top: 0;
-  width: 100%;
-  padding: 1rem;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-  background: rgb(247, 248, 250);
-  z-index: 100;
-`;
+import Navbar from './components/Navbar';
+import { AnimatePresence } from 'framer-motion';
 
-const StyledLink = styled(Link)`
-  text-transform: uppercase;
-`;
+const Home = lazy(() => import('./components/Home'));
+const StakingSwap = lazy(() => import('./components/StakingSwap'));
 
 const Layout = styled.div`
-  background: rgb(247, 248, 250);
+  background: #fff;
+  overflow: hidden;
 `;
 
-const NetWorkButton = styled(StyledButton)`
-  background: orange;
-  text-transform: uppercase;
-  font-size: 12px;
-`;
 function App() {
   const { account, networkId } = useContext(AppContext);
-  const { switchNetworkHandler } = useMetamask();
 
   // useEffect(() => {
   //   const init = async () => {
@@ -142,43 +119,19 @@ function App() {
   return (
     <Layout>
       <GlobalStyled />
-      <Navbar>
-        <Flex
-          justifyContent="space-between"
-          alignItems="center"
-          className="container h-100"
-        >
-          <Flex alignItems="center"></Flex>
-          <Flex alignItems="center">
-            {networkId !== 4 && account ? (
-              <>
-                <NetWorkButton onClick={() => switchNetworkHandler(4)}>
-                  Wrong network
-                </NetWorkButton>
-              </>
-            ) : (
-              RenderConnectButton(account)
-            )}
-          </Flex>
-        </Flex>
-      </Navbar>
-      <Routes>
-        <Route
-          path="/"
-          element={<StakingSwap networkId={networkId} account={account} />}
-        />
-        {/* <Route exace path="/staking" element={<Staking account={account} />} /> */}
-      </Routes>
+      <Navbar account={account} networkId={networkId} />
+      <AnimatePresence exitBeforeEnter initial={false}>
+        <Suspense fallback={<div />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/swap"
+              element={<StakingSwap networkId={networkId} account={account} />}
+            />
+          </Routes>
+        </Suspense>
+      </AnimatePresence>
     </Layout>
-
-    // <React.Fragment>
-
-    //   {/* <TokenSwapScreen
-    //     Web3={web3}
-    //     Contracts={contracts}
-    //     Accounts={accounts}
-    //   ></TokenSwapScreen> */}
-    // </React.Fragment>
   );
 }
 

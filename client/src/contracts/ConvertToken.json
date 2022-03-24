@@ -1,74 +1,5 @@
 [
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "_fees", "type": "uint256" },
-      {
-        "internalType": "address",
-        "name": "_addressReceiveTokenSwap",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "by",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "ClaimProfit",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "by",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "ClaimStaking",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "by",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "Deposit",
-    "type": "event"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
@@ -88,63 +19,10 @@
     "type": "event"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_totalPercentProfit",
-        "type": "uint256"
-      },
-      { "internalType": "uint256", "name": "_vestingTime", "type": "uint256" },
-      { "internalType": "uint256[]", "name": "_lockups", "type": "uint256[]" }
-    ],
-    "name": "addPackage",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "addressReceiveTokenSwap",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "token0", "type": "address" },
-      { "internalType": "address", "name": "token1", "type": "address" }
-    ],
-    "name": "cancelPauseToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address[]", "name": "token0", "type": "address[]" },
-      { "internalType": "address[]", "name": "token1", "type": "address[]" }
-    ],
-    "name": "cancelPauseTokens",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "_profileId", "type": "uint256" }
-    ],
-    "name": "claimProfit",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "_profileId", "type": "uint256" }
-    ],
-    "name": "claimStaking",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -155,161 +33,9 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "_profileId", "type": "uint256" }
-    ],
-    "name": "getCurrentProfit",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "_profileId", "type": "uint256" }
-    ],
-    "name": "getCurrentStakeUnlock",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "_packageId", "type": "uint256" }
-    ],
-    "name": "getLockups",
-    "outputs": [
-      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "user", "type": "address" }
-    ],
-    "name": "getProfilesByAddress",
-    "outputs": [
-      {
-        "components": [
-          { "internalType": "uint256", "name": "id", "type": "uint256" },
-          { "internalType": "address", "name": "user", "type": "address" },
-          { "internalType": "uint256", "name": "amount", "type": "uint256" },
-          {
-            "internalType": "uint256",
-            "name": "profitClaimed",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "stakeClaimed",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "vestingStart",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "vestingEnd",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "totalProfit",
-            "type": "uint256"
-          },
-          { "internalType": "uint256", "name": "packageId", "type": "uint256" },
-          { "internalType": "bool", "name": "refunded", "type": "bool" },
-          { "internalType": "address", "name": "stakeToken", "type": "address" }
-        ],
-        "internalType": "struct ConvertAndStakingContract.UserInfo[]",
-        "name": "",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getProfilesLength",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getStakers",
-    "outputs": [
-      { "internalType": "address[]", "name": "", "type": "address[]" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "listOfBankAccount",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "", "type": "address" },
-      { "internalType": "address", "name": "", "type": "address" }
-    ],
-    "name": "listOfPauseTokens",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "", "type": "address" },
-      { "internalType": "address", "name": "", "type": "address" }
-    ],
-    "name": "listOfTokenConvertRatio",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" },
-      { "internalType": "uint256", "name": "", "type": "uint256" }
-    ],
-    "name": "lockups",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "name",
-    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "owner",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "name": "packages",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "totalPercentProfit",
-        "type": "uint256"
-      },
-      { "internalType": "uint256", "name": "vestingTime", "type": "uint256" },
-      { "internalType": "bool", "name": "isActive", "type": "bool" }
-    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -322,161 +48,18 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "receiveAddress", "type": "address" }
-    ],
-    "name": "setAddressReceiveTokenSwap",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "_Fees", "type": "uint256" }
-    ],
-    "name": "setFees",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "_packageId", "type": "uint256" },
-      { "internalType": "bool", "name": "_isActive", "type": "bool" }
-    ],
-    "name": "setPackage",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "token0", "type": "address" },
-      { "internalType": "address", "name": "token1", "type": "address" }
-    ],
-    "name": "setPauseToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address[]", "name": "token0", "type": "address[]" },
-      { "internalType": "address[]", "name": "token1", "type": "address[]" }
-    ],
-    "name": "setPauseTokens",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "token0", "type": "address" },
-      { "internalType": "address", "name": "token1", "type": "address" },
-      { "internalType": "uint256", "name": "rate", "type": "uint256" }
-    ],
-    "name": "setRate",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address[]", "name": "token0", "type": "address[]" },
-      { "internalType": "address[]", "name": "token1", "type": "address[]" },
-      { "internalType": "uint256[]", "name": "rates", "type": "uint256[]" }
-    ],
-    "name": "setRates",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "token", "type": "address" },
-      { "internalType": "address", "name": "bankAddress", "type": "address" }
-    ],
-    "name": "setTokenBankAccount",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address[]", "name": "tokens", "type": "address[]" },
       {
-        "internalType": "address[]",
-        "name": "bankAddresses",
-        "type": "address[]"
-      }
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "from", "type": "address" },
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
-    "name": "setTokenBankAccounts",
+    "name": "transferAuth",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "_amount", "type": "uint256" },
-      { "internalType": "uint256", "name": "_packageId", "type": "uint256" },
-      { "internalType": "address", "name": "_stakeToken", "type": "address" }
-    ],
-    "name": "stake",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "name": "stakers",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "token0", "type": "address" },
-      { "internalType": "address", "name": "token1", "type": "address" },
-      { "internalType": "uint256", "name": "amountToken0", "type": "uint256" },
-      { "internalType": "uint256", "name": "_packageId", "type": "uint256" }
-    ],
-    "name": "swapToken0ToToken1",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalClaimedProfit",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalClaimedStaking",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "totalProfile",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalProfit",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalStaking",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -486,25 +69,6 @@
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "name": "userInfo",
-    "outputs": [
-      { "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "internalType": "address", "name": "user", "type": "address" },
-      { "internalType": "uint256", "name": "amount", "type": "uint256" },
-      { "internalType": "uint256", "name": "profitClaimed", "type": "uint256" },
-      { "internalType": "uint256", "name": "stakeClaimed", "type": "uint256" },
-      { "internalType": "uint256", "name": "vestingStart", "type": "uint256" },
-      { "internalType": "uint256", "name": "vestingEnd", "type": "uint256" },
-      { "internalType": "uint256", "name": "totalProfit", "type": "uint256" },
-      { "internalType": "uint256", "name": "packageId", "type": "uint256" },
-      { "internalType": "bool", "name": "refunded", "type": "bool" },
-      { "internalType": "address", "name": "stakeToken", "type": "address" }
-    ],
-    "stateMutability": "view",
     "type": "function"
   }
 ]

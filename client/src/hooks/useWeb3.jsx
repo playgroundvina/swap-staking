@@ -1,7 +1,7 @@
 import React from 'react';
 import SwapStakingABI from '../contracts/ConvertToken.json';
 import ERC20 from '../contracts/ERC20.json';
-const SWAPCONTRACT_ADDRESS = '0x161425B9d0b19DA082E392047ED590025a9d0510';
+const SWAPCONTRACT_ADDRESS = '0xEde7C008DbB6cA42688Ed88F617CdFB15997a6b1';
 
 const getSwapStakingContract = (web3) =>
   new web3.eth.Contract(SwapStakingABI, SWAPCONTRACT_ADDRESS);
@@ -35,16 +35,6 @@ const useWeb3 = (web3, account) => {
     const balanceRes = await tokenContract.methods.balanceOf(account).call();
 
     return +balanceRes / convertToWeii('1');
-  };
-
-  const getSwapRatio = async (token0Address, token1Address) => {
-    const swapContract = getSwapStakingContract(web3);
-
-    const ratioRes = await swapContract.methods
-      .listOfTokenConvertRatio(token0Address, token1Address)
-      .call();
-
-    return +ratioRes / 1000;
   };
 
   const onSwapHandler = async (token0Address, token1Address, amount, pkgId) => {
@@ -129,28 +119,6 @@ const useWeb3 = (web3, account) => {
     } catch (error) {}
   };
 
-  const harvestProfit = async (profileId) => {
-    try {
-      const contract = getSwapStakingContract(web3);
-      return await contract.methods
-        .claimProfit(profileId)
-        .send({ from: account });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const unlockStake = async (profileId) => {
-    try {
-      const contract = getSwapStakingContract(web3);
-      return await contract.methods
-        .claimStaking(profileId)
-        .send({ from: account });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const convertToWeii = (amount) => web3.utils.toWei(amount);
   const convertToTokens = (amount) => {
     return web3.utils.fromWei(amount, 'ether');
@@ -159,11 +127,8 @@ const useWeb3 = (web3, account) => {
     onSwapHandler,
     onAprroveCheck,
     getBalanceOf,
-    getSwapRatio,
     onApproveHandler,
     getHistoryStake,
-    harvestProfit,
-    unlockStake
   };
 };
 
